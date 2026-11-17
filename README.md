@@ -2,7 +2,7 @@
 
 Python implementation in progress of the two-stage semiparametric varying-coefficient fuzzy time-series model described by Chen L. and Lu Q. J., *Mathematical Modeling and Its Applications*, 15(1), 10–20 (2026), DOI: 10.19943/j.2095-3070.jmmia.2026.01.02.
 
-**Status / 复现状态：** 两阶段拟合、四种核函数、留一带宽选择、模糊化、MSE、MAE 和三角模糊数 MSM 已实现，并已使用深证成指、黄金和上海气温数据运行。**不同数据源及实现假设会造成结果差异；原文其他对比方法和异常值检测尚未复现。**
+**Status / 复现状态：** 两阶段拟合、四种核函数、留一带宽选择、模糊化、MSE、MAE 和三角模糊数 MSM 已实现，并已使用深证成指、黄金和上海气温数据运行。**不同数据源及实现假设会造成结果差异；除自定义 AR 基线及 Cook 距离近似诊断外，原文其他对比方法和模糊异常值检测尚未复现。**
 
 ## 实验结果 / Experimental results
 
@@ -31,6 +31,47 @@ Python implementation in progress of the two-stage semiparametric varying-coeffi
 ![黄金残差](figures/case_gold_residual.png)
 ![上海气温拟合](figures/case_shanghai_fit.png)
 ![上海气温残差](figures/case_shanghai_residual.png)
+
+### 补充对比、诊断与核函数分析
+
+以下均使用同一批实验样本和全样本拟合，不能作为样本外预测比较。AR 基线为对中心序列独立拟合的 OLS AR(3)，预测左右展形设为零；由于输出是精确值而非模糊数，按连续面积定义 MSM 为 0，MSE 和 MAE 包含未预测展形的误差。这是本仓库明确指定的基线，**不能认为与论文 AR 的具体实现完全一致**。
+
+| 案例 | 方法 | MSE | MAE | MSM |
+|---|---|---:|---:|---:|
+| 深证成指 | 中心 AR(3) | 0.00037630 | 0.029681 | 0 |
+| 深证成指 | 两阶段模型 | 0.00007162 | 0.009771 | 0.468007 |
+| 黄金 | 中心 AR(3) | 0.00041884 | 0.030394 | 0 |
+| 黄金 | 两阶段模型 | 0.00006036 | 0.009411 | 0.534770 |
+| 上海气温差分 | 中心 AR(3) | 2.556561 | 2.143631 | 0 |
+| 上海气温差分 | 两阶段模型 | 1.844584 | 1.145944 | 0.168926 |
+
+**游程检验与异常值诊断。** 游程检验采用中心序列的样本中位数、剔除与中位数相同的值、双侧正态近似，无连续性校正；Cook 距离使用中心序列 AR(3) 的普通最小二乘残差，超出均值 ± 3 倍样本标准差视为标记。该 Cook 图是可复现的**中心序列近似诊断**，并非论文引用方法的模糊 Cook 距离实现；标记点未被删除，游程检验也不能单独证明平稳性。黄金序列的 p 值低于 0.05，表明在该设置下不应声称通过游程检验。
+
+| 案例 | 游程数 | p 值 | Cook 近似标记点 |
+|---|---:|---:|---:|
+| 深证成指 | 89 | 0.117008 | 4 |
+| 黄金 | 110 | 0.00000129 | 6 |
+| 上海气温差分 | 65 | 0.585428 | 2 |
+
+**核函数敏感性。** 第一、二阶段均使用相同核，带宽固定 0.3，不重新为各核调参；表中为第二阶段样本内 MSE。紧支撑核与高斯核在相同带宽值下有效权重分布不同，结果不构成公平的最优模型排名。
+
+| 案例 | Gaussian | Epanechnikov | Biweight | Triweight |
+|---|---:|---:|---:|---:|
+| 深证成指 | 0.00007162 | 0.00007000 | 0.00006851 | 0.00006741 |
+| 黄金 | 0.00006036 | 0.00005987 | 0.00005879 | 0.00005808 |
+| 上海气温差分 | 1.844584 | 1.784778 | 1.752973 | 1.729389 |
+
+以下为三组案例的中心序列 Cook 近似图、中心滞后系数图、核函数敏感性图。运行 `PYTHONPATH=. OPENBLAS_NUM_THREADS=1 python experiments/run_diagnostics.py` 可重新生成，数值与标记日期见 `results/diagnostics_summary.json`。
+
+![深证 Cook 近似](figures/case_shenzhen_cook.png)
+![深证系数](figures/case_shenzhen_coefficients.png)
+![深证核函数](figures/case_shenzhen_kernels.png)
+![黄金 Cook 近似](figures/case_gold_cook.png)
+![黄金系数](figures/case_gold_coefficients.png)
+![黄金核函数](figures/case_gold_kernels.png)
+![上海 Cook 近似](figures/case_shanghai_cook.png)
+![上海系数](figures/case_shanghai_coefficients.png)
+![上海核函数](figures/case_shanghai_kernels.png)
 
 ### 论文报告的结果（未独立复现）
 
@@ -96,4 +137,4 @@ Input CSV columns: `center,left,right`. Outputs `fitted.csv` and `summary.json`.
 1. The PDF does not provide the authors’ original observations, exact providers or market conventions. This repository uses alternate datasets, including Shanghai temperatures from 2017; it also explicitly assumes differencing before fuzzification.
 2. Exact kernel selections, practical bandwidth search limits, numerical optimizer and convergence settings are not fully specified. Obtaining original code/data would help distinguish assumptions from the authors' implementation.
 3. Section 3.2 text reports temperature MAE 0.6602, whereas Table 2 reports 0.6620. Both are retained pending confirmation.
-4. The paper's baseline models and result tables have not been independently reproduced. No synthetic result should be compared as if it were a paper result. Add source provenance, exact data and chronological evaluation before making accuracy claims.
+4. Except for an explicitly defined illustrative centre-only AR baseline, the paper's other baseline models and result tables have not been independently reproduced. No synthetic result should be compared as if it were a paper result. Add source provenance, exact data and chronological evaluation before making accuracy claims.
