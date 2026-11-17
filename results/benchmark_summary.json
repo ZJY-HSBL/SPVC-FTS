@@ -1,0 +1,64 @@
+{
+  "nile": {
+    "data_points": 100,
+    "fitted_points": 99,
+    "years": [
+      1871,
+      1970
+    ],
+    "scale_divisor": 1000,
+    "lags": [
+      1,
+      1,
+      1
+    ],
+    "h_np": 0.25,
+    "h_vc": 0.25,
+    "kernel": "gaussian",
+    "scores": {
+      "stage1": {
+        "mse": 0.020551569088153022,
+        "mae": 0.15748159756565744,
+        "invalid_spreads": 0,
+        "msm": 0.3928021571141244
+      },
+      "stage2": {
+        "mse": 0.019788250826386692,
+        "mae": 0.1531771442520934,
+        "invalid_spreads": 0,
+        "msm": 0.4002434087480969
+      }
+    }
+  },
+  "sunspots": {
+    "data_points": 309,
+    "fitted_points": 308,
+    "years": [
+      1700,
+      2008
+    ],
+    "scale_divisor": 100,
+    "lags": [
+      1,
+      1,
+      1
+    ],
+    "h_np": 0.25,
+    "h_vc": 0.25,
+    "kernel": "gaussian",
+    "scores": {
+      "stage1": {
+        "mse": 0.05459487212484626,
+        "mae": 0.22561037714635068,
+        "invalid_spreads": 0,
+        "msm": 0.31596185163975393
+      },
+      "stage2": {
+        "mse": 0.05453527740870368,
+        "mae": 0.22478352776357263,
+        "invalid_spreads": 0,
+        "msm": 0.31665931143400655
+      }
+    }
+  }
+}
