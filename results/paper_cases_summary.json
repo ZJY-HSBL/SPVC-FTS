@@ -1,0 +1,167 @@
+{
+  "shenzhen": {
+    "input_rows": 199,
+    "series": "Shenzhen Component Index",
+    "period": "2023-02-24..2023-12-15",
+    "lags": [
+      3,
+      3,
+      3
+    ],
+    "kernel": "gaussian",
+    "stage1_cv": {
+      "bandwidth": 0.3,
+      "candidates": [
+        0.1,
+        0.2,
+        0.3
+      ],
+      "scores": [
+        4.6870724912636066e-05,
+        4.631097756365559e-05,
+        4.606777371372195e-05
+      ],
+      "stage": 1
+    },
+    "stage2_cv": {
+      "bandwidth": 0.3,
+      "candidates": [
+        0.1,
+        0.2,
+        0.3
+      ],
+      "scores": [
+        4.714170941288829e-05,
+        4.663511128201978e-05,
+        4.639236067061001e-05
+      ],
+      "stage": 2
+    },
+    "scores": {
+      "stage1": {
+        "mse": 7.276307964995874e-05,
+        "mae": 0.00980333368292484,
+        "nonpositive_spreads": 0,
+        "msm": 0.4662324568962546
+      },
+      "stage2": {
+        "mse": 7.162443830978207e-05,
+        "mae": 0.0097710115626393,
+        "nonpositive_spreads": 0,
+        "msm": 0.4680071813618497
+      }
+    },
+    "fitted_rows": 195
+  },
+  "gold": {
+    "input_rows": 304,
+    "series": "GOLD D1 broker bars",
+    "period": "2023-07-19..2024-09-19",
+    "lags": [
+      3,
+      3,
+      3
+    ],
+    "kernel": "gaussian",
+    "stage1_cv": {
+      "bandwidth": 0.3,
+      "candidates": [
+        0.1,
+        0.2,
+        0.3
+      ],
+      "scores": [
+        3.5153535867970684e-05,
+        3.500960496167218e-05,
+        3.494477280005438e-05
+      ],
+      "stage": 1
+    },
+    "stage2_cv": {
+      "bandwidth": 0.3,
+      "candidates": [
+        0.1,
+        0.2,
+        0.3
+      ],
+      "scores": [
+        3.550576825572091e-05,
+        3.504904532250064e-05,
+        3.4883111502684145e-05
+      ],
+      "stage": 2
+    },
+    "scores": {
+      "stage1": {
+        "mse": 6.13482822256297e-05,
+        "mae": 0.009559116484803785,
+        "nonpositive_spreads": 0,
+        "msm": 0.5313791189389808
+      },
+      "stage2": {
+        "mse": 6.0357881363856875e-05,
+        "mae": 0.009410722152786887,
+        "nonpositive_spreads": 0,
+        "msm": 0.5347697041813045
+      }
+    },
+    "fitted_rows": 300
+  },
+  "shanghai": {
+    "input_rows": 123,
+    "series": "Shanghai mean temperature first differences",
+    "period": "2017-05-01..2017-08-31",
+    "original_normal_infeasible_count": 12,
+    "original_sigma": 1.4313427222330481,
+    "used_sigma": 3.88962604536086,
+    "lags": [
+      3,
+      3,
+      3
+    ],
+    "kernel": "gaussian",
+    "stage1_cv": {
+      "bandwidth": 0.3,
+      "candidates": [
+        0.1,
+        0.2,
+        0.3
+      ],
+      "scores": [
+        1.5772918839976662,
+        1.543143533175596,
+        1.536043325912606
+      ],
+      "stage": 1
+    },
+    "stage2_cv": {
+      "bandwidth": 0.3,
+      "candidates": [
+        0.1,
+        0.2,
+        0.3
+      ],
+      "scores": [
+        2.437069314877787,
+        1.8421421066678016,
+        1.7275049538541074
+      ],
+      "stage": 2
+    },
+    "scores": {
+      "stage1": {
+        "mse": 2.053912701150408,
+        "mae": 1.1486418272078125,
+        "nonpositive_spreads": 0,
+        "msm": 0.1571859929454771
+      },
+      "stage2": {
+        "mse": 1.8445842031768576,
+        "mae": 1.1459440782336137,
+        "nonpositive_spreads": 0,
+        "msm": 0.16892550925744737
+      }
+    },
+    "fitted_rows": 119
+  }
+}

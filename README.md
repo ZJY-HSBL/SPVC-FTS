@@ -2,9 +2,35 @@
 
 Python implementation in progress of the two-stage semiparametric varying-coefficient fuzzy time-series model described by Chen L. and Lu Q. J., *Mathematical Modeling and Its Applications*, 15(1), 10–20 (2026), DOI: 10.19943/j.2095-3070.jmmia.2026.01.02.
 
-**Status / 复现状态：** 两阶段拟合、四种核函数、留一带宽选择、模糊化、MSE、MAE 和三角模糊数 MSM 已实现并通过合成数据测试；**尚未取得并核实论文原始数据，也尚未复现论文表格结果或基线模型。** 实现中未明确的地方使用下述假设，不能声称数值已复现。
+**Status / 复现状态：** 两阶段拟合、四种核函数、留一带宽选择、模糊化、MSE、MAE 和三角模糊数 MSM 已实现，并已使用深证成指、黄金和上海气温数据运行。**不同数据源及实现假设会造成结果差异；原文其他对比方法和异常值检测尚未复现。**
 
 ## 实验结果 / Experimental results
+
+### 论文同主题案例：本仓库实际运行
+
+三组数据分别为深证成指（199 条原始价格，2023-02-24 至 2023-12-15）、黄金日 K 线（304 条，时间戳为 2023-07-19 至 2024-09-19）、上海日均气温（123 条，2017-05-01 至 2017-08-31）。**气温年份与论文不同；黄金日 K 线交易时间与论文来源可能不同，条数也不同。** 金融数据使用论文的三角模糊收益率公式；气温以一阶差分为中心。完整结果是样本内拟合而非未来预测。
+
+使用高斯核、三阶滞后；两个阶段分别在 `[0.1, 0.2, 0.3]` 中执行留一带宽选择，最终均选 0.3。该值位于搜索上界，因此不能断言是全局最优。下面的 MSE 和 MAE 使用程序原始单位，金融案例均为自然对数收益率；MSM 越高表示三角模糊数重合程度越高。
+
+| 案例 | 阶段 | 拟合点数 | MSE | MAE | MSM |
+|---|---|---:|---:|---:|---:|
+| 深证成指 | 第一阶段 | 195 | 0.0000727631 | 0.00980333 | 0.466232 |
+| 深证成指 | 第二阶段 | 195 | 0.0000716244 | 0.00977101 | 0.468007 |
+| 黄金 | 第一阶段 | 300 | 0.0000613483 | 0.00955912 | 0.531379 |
+| 黄金 | 第二阶段 | 300 | 0.0000603579 | 0.00941072 | 0.534770 |
+| 上海气温差分 | 第一阶段 | 119 | 2.053913 | 1.148642 | 0.157186 |
+| 上海气温差分 | 第二阶段 | 119 | 1.844584 | 1.145944 | 0.168926 |
+
+**气温处理限制：** 将本次 122 个气温差分值直接代入论文的总体均值和标准差时，有 12 个值的单侧正态尾概率不大于 0.05，论文所写的区间概率方程不存在有限解。为使该案例可运行，本实验将标准差从 1.431343 调整至 3.889626，即取原标准差与 `1.05 × max(|x-μ|) / Φ⁻¹(0.95)` 的较大者。此处属于明确的实现假设，不是论文所述标准差；其结果对这一选择敏感。差分后模糊化也是本文对论文描述的具体解释。
+
+数据来源：[深证指数 CSV](https://github.com/1376524890/bigdata_fin/blob/master/real_data/01_%E6%8C%87%E6%95%B0%E6%95%B0%E6%8D%AE/sz_index_daily.csv)、[黄金日 K 线](https://github.com/tohaitrieu/market-history/blob/master/data/commodities/GOLD/GOLD-D1.csv)、[上海气温](https://github.com/Ariza-Sun/MetroFlow/blob/main/Data/MetaData/shanghai_weatherDaily.csv)。原始截取数据、逐点拟合及交叉验证结果保存在 `data/` 和 `results/`，运行 `PYTHONPATH=. OPENBLAS_NUM_THREADS=1 python experiments/run_paper_cases.py` 可重建结果与图片，运行时间较长。
+
+![深证成指拟合](figures/case_shenzhen_fit.png)
+![深证成指残差](figures/case_shenzhen_residual.png)
+![黄金拟合](figures/case_gold_fit.png)
+![黄金残差](figures/case_gold_residual.png)
+![上海气温拟合](figures/case_shanghai_fit.png)
+![上海气温残差](figures/case_shanghai_residual.png)
 
 ### 论文报告的结果（未独立复现）
 
@@ -67,7 +93,7 @@ Input CSV columns: `center,left,right`. Outputs `fitted.csv` and `summary.json`.
 
 ## Unresolved reproduction issues / 待解决问题
 
-1. The paper describes Shenzhen index daily high/low (2023-02-24–2023-12-15), gold daily high/low (2023-07-19–2024-09-20), and Shanghai daily mean temperature (2024-01-01–2024-09-30), but the PDF does not provide the raw observations, exact providers or market/instrument conventions. It also does not unambiguously explain how differencing is applied in the temperature experiment.
+1. The PDF does not provide the authors’ original observations, exact providers or market conventions. This repository uses alternate datasets, including Shanghai temperatures from 2017; it also explicitly assumes differencing before fuzzification.
 2. Exact kernel selections, practical bandwidth search limits, numerical optimizer and convergence settings are not fully specified. Obtaining original code/data would help distinguish assumptions from the authors' implementation.
 3. Section 3.2 text reports temperature MAE 0.6602, whereas Table 2 reports 0.6620. Both are retained pending confirmation.
 4. The paper's baseline models and result tables have not been independently reproduced. No synthetic result should be compared as if it were a paper result. Add source provenance, exact data and chronological evaluation before making accuracy claims.
